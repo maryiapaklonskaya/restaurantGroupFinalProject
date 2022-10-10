@@ -15,3 +15,17 @@ public class Orders {
 
 }
 
+public static class Maryia(String[] args){
+
+}
+
+
+public static class Sasha(String[] args){
+
+}
+
+public static class Lena(String[] args){
+
+}
+
+
