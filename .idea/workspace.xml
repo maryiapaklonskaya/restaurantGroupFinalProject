@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="2nd commit by Jelena (small correction of 7th method)">
+      <change afterPath="$PROJECT_DIR$/src/main/java/TestByLena.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Lena.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Lena.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +41,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="RunManager" selected="Application.Lena">
+  <component name="RunManager" selected="Application.TestByLena">
     <configuration name="Lena" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Lena" />
       <module name="restaurant_project" />
@@ -57,8 +56,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TestByLena" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="TestByLena" />
+      <module name="restaurant_project" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.TestByLena" />
         <item itemvalue="Application.Lena" />
         <item itemvalue="Application.Maryia" />
       </list>
@@ -122,13 +129,32 @@
       <option name="project" value="LOCAL" />
       <updated>1665474870464</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="2nd commit by Jelena (small correction of 7th method)">
+      <created>1665484963336</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1665484963336</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first commit" />
     <MESSAGE value="master commit test" />
     <MESSAGE value="first steps in project" />
-    <option name="LAST_COMMIT_MESSAGE" value="first steps in project" />
+    <MESSAGE value="2nd commit by Jelena (small correction of 7th method)" />
+    <option name="LAST_COMMIT_MESSAGE" value="2nd commit by Jelena (small correction of 7th method)" />
   </component>
 </project>
