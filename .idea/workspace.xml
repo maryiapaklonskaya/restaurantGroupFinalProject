@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="1st commit by Jelena">
+    <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Lena.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Lena.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Maryia.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Maryia.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,11 +29,11 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GithubDefaultAccount">
-    <option name="defaultAccountId" value="ff287453-0592-49d1-8025-11bf04f779e5" />
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectId" id="2FrQvFFUkO02JFtiI9cDCSj8cLr" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -41,12 +41,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+  }
+}</component>
   <component name="RunManager">
-    <configuration name="Lena" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Lena" />
+    <configuration name="Maryia" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Maryia" />
       <module name="restaurant_project" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -54,7 +57,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Lena" />
+        <item itemvalue="Application.Maryia" />
       </list>
     </recent_temporary>
   </component>
@@ -74,44 +77,41 @@
       <option name="project" value="LOCAL" />
       <updated>1665248105477</updated>
     </task>
-    <task id="LOCAL-00002" summary="1st commit by Jelena">
-      <created>1665434639030</created>
+    <task id="LOCAL-00002" summary="master commit test">
+      <created>1665426121970</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1665434639030</updated>
+      <updated>1665426121970</updated>
     </task>
-    <task id="LOCAL-00003" summary="1st commit by Jelena">
-      <created>1665434812581</created>
+    <task id="LOCAL-00003" summary="master commit test">
+      <created>1665426244553</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1665434812581</updated>
+      <updated>1665426244553</updated>
     </task>
-    <task id="LOCAL-00004" summary="1st commit by Jelena">
-      <created>1665438054151</created>
+    <task id="LOCAL-00004" summary="master commit test">
+      <created>1665426322730</created>
       <option name="number" value="00004" />
       <option name="presentableId" value="LOCAL-00004" />
       <option name="project" value="LOCAL" />
-      <updated>1665438054151</updated>
+      <updated>1665426322731</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="first steps in project">
+      <created>1665441986694</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1665441986695</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="first commit" />
-    <MESSAGE value="1st commit by Jelena" />
-    <option name="LAST_COMMIT_MESSAGE" value="1st commit by Jelena" />
+    <MESSAGE value="master commit test" />
+    <MESSAGE value="first steps in project" />
+    <option name="LAST_COMMIT_MESSAGE" value="first steps in project" />
   </component>
 </project>
