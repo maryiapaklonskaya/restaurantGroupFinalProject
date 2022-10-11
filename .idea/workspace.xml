@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-10-11_14_08__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-10-11_14_08__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Maryia.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Maryia.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Sasha/Sasha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Sasha/Sasha.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +42,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="RunManager" selected="Application.TestByLena">
+  <component name="RunManager" selected="Application.Lena">
     <configuration name="Lena" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Lena" />
       <module name="restaurant_project" />
@@ -65,9 +66,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Lena" />
         <item itemvalue="Application.TestByLena" />
         <item itemvalue="Application.Maryia" />
-        <item itemvalue="Application.Lena" />
         <item itemvalue="Application.Lena" />
       </list>
     </recent_temporary>

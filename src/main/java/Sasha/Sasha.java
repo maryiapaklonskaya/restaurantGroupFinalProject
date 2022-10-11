@@ -3,27 +3,91 @@ package Sasha;
 import java.sql.*;
 
 public class Sasha {
-//                      - getTop10ClosedOrdersDesc()
-//						- SortWaitersBySumRevenueDESC()
-//						- getMeanClosedOrders() \\ avg
-//						* theMostPopularMealsDESC() - count
 
-    public static void getTop10ClosedOrdersDesc(){
-        String findCloseOrders = "SELECT orders.id, orders_items.meal_id, orders_items.quantity_of_meals FROM orders LEFT JOIN orders_items ON orders.id = orders_items.order_id WHERE orders.status=\"Close\";";
+    public static void theMostPopularMealsDESC(Connection connection) throws SQLException{
+        String mostPopularMeal = "SELECT meal_title, count(quantity_of_meals) FROM restaurant.orders_items \n" +
+                "INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id\n" +
+                "GROUP BY meal_id ORDER BY count(quantity_of_meals) DESC LIMIT 5;";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(mostPopularMeal);
+
+        while (resultSet.next()) {
+            if(resultSet.getInt(2) > 1) {
+                System.out.print("\""+resultSet.getString(1)+"\"");
+                System.out.println(", amount of orders: " + resultSet.getInt(2));
+            }
+        }
+    }
+    public  static  void getMeanClosedOrders(Connection connection) throws SQLException{
+        String getClosedOrders = "SELECT ROUND(SUM(price*quantity_of_meals),2) " +
+                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
+                " ON orders.id = orders_items.order_id WHERE status=\"closed\" GROUP BY order_id";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(getClosedOrders);
+
+        double countRow = 0;
+        double amount = 0;
+
+        while (resultSet.next()) {
+            amount += resultSet.getDouble(1);
+            countRow ++;
+        }
+
+        System.out.println("Average closed check "+amount/countRow);
+    }
+    public static void sortWaitersBySumRevenueDESC(Connection connection) throws SQLException{
+        String sortWaitersByRevenueDESC = "SELECT waiters.name, waiters.surname, ROUND(SUM(price*quantity_of_meals),2)\n" +
+                " FROM restaurant.waiters INNER JOIN restaurant.tables ON waiters.id = tables.waiter_id\n" +
+                " INNER JOIN restaurant.orders ON orders.tables_id = tables.id \n" +
+                " INNER JOIN restaurant.orders_items ON orders_items.order_id = orders.id\n" +
+                " INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id\n" +
+                " GROUP BY waiters.id ORDER BY ROUND(SUM(price*quantity_of_meals),2) DESC;";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(sortWaitersByRevenueDESC);
+
+        while (resultSet.next()) {
+            System.out.print(resultSet.getString(1));
+            System.out.print(" " + resultSet.getString(2));
+            System.out.println("   Total amount: " + resultSet.getDouble(3));
+        }
+    }
+
+    public static void getTop10ClosedOrdersDesc(Connection connection) throws SQLException{
+        String Top10ClosedOrdersDesc = "SELECT order_id, restaurant.orders.tables_id, restaurant.orders.status, ROUND(SUM(price*quantity_of_meals),2) " +
+                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
+                " ON orders.id = orders_items.order_id WHERE status=\"closed\" GROUP BY order_id ORDER BY ROUND(SUM(price*quantity_of_meals),2) DESC LIMIT 10";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(Top10ClosedOrdersDesc);
+
+        while (resultSet.next()) {
+            System.out.print("Total amount: " + resultSet.getDouble(4));
+            System.out.print("   Order ID: " + resultSet.getInt(1));
+            System.out.print("  Table ID: " + resultSet.getInt(2));
+            System.out.println("  Status: " + resultSet.getString(3));
+        }
     }
     public static void main(String[] args) throws SQLException {
         Connection connection =
                 DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "sadomazo911");
 
-        addMeal(connection, "lazania", 5, MealType.MAIN_COURSES);
-        findMeal(connection, "lazania");
-        setNewPrice(connection, "lazania", 100);
-        findMeal(connection, "lazania");
-        renameMeal(connection, "lazania", "lasagna");
-        findMeal(connection, "lazania");
-        findMeal(connection, "lasagna");
-        removeMeal(connection, "lazania");
-        removeMeal(connection, "lasagna");
+//        addMeal(connection, "lazania", 5, MealType.MAIN_COURSES);
+//        findMeal(connection, "lazania");
+//        setNewPrice(connection, "lazania", 100);
+//        findMeal(connection, "lazania");
+//        renameMeal(connection, "lazania", "lasagna");
+//        findMeal(connection, "lazania");
+//        findMeal(connection, "lasagna");
+//        removeMeal(connection, "lazania");
+//        removeMeal(connection, "lasagna");
+
+        getTop10ClosedOrdersDesc(connection);
+        sortWaitersBySumRevenueDESC(connection);
+        getMeanClosedOrders(connection);
+        theMostPopularMealsDESC(connection);
     }
 
     public static void addMeal(Connection connection, String mealTitle, int price, MealType mealType) throws SQLException{

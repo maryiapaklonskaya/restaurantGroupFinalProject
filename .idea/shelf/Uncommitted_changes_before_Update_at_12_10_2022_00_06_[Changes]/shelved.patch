@@ -1,0 +1,186 @@
+Index: src/main/java/Sasha/Sasha.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Sasha;\r\n\r\nimport java.sql.*;\r\n\r\npublic class Sasha {\r\n//                      - getTop10ClosedOrdersDesc()\r\n//\t\t\t\t\t\t- SortWaitersBySumRevenueDESC()\r\n//\t\t\t\t\t\t- getMeanClosedOrders() \\\\ avg\r\n//\t\t\t\t\t\t* theMostPopularMealsDESC() - count\r\n\r\n    public static void getTop10ClosedOrdersDesc(){\r\n        String findCloseOrders = \"SELECT orders.id, orders_items.meal_id, orders_items.quantity_of_meals FROM orders LEFT JOIN orders_items ON orders.id = orders_items.order_id WHERE orders.status=\\\"Close\\\";\";\r\n    }\r\n    public static void main(String[] args) throws SQLException {\r\n        Connection connection =\r\n                DriverManager.getConnection(\"jdbc:mysql://localhost:3306/test\", \"root\", \"sadomazo911\");\r\n\r\n        addMeal(connection, \"lazania\", 5, MealType.MAIN_COURSES);\r\n        findMeal(connection, \"lazania\");\r\n        setNewPrice(connection, \"lazania\", 100);\r\n        findMeal(connection, \"lazania\");\r\n        renameMeal(connection, \"lazania\", \"lasagna\");\r\n        findMeal(connection, \"lazania\");\r\n        findMeal(connection, \"lasagna\");\r\n        removeMeal(connection, \"lazania\");\r\n        removeMeal(connection, \"lasagna\");\r\n    }\r\n\r\n    public static void addMeal(Connection connection, String mealTitle, int price, MealType mealType) throws SQLException{\r\n        if(isMealPresent(connection, mealTitle)) {System.out.println(\"This meal already exist\");  return;}\r\n\r\n        Meal meal = new Meal(mealTitle, price, mealType);\r\n        int mealTypeId = getMealTypeId(connection, mealType);\r\n\r\n        addToDatabase(connection, meal, mealTypeId);\r\n    }\r\n\r\n    public static void setNewPrice(Connection connection, String mealTitle, int newPrice) throws SQLException {\r\n        if(!isMealPresent(connection, mealTitle)) {System.out.println(\"This meal isn't exist\"); return;}\r\n\r\n        String setNewPrice = \"UPDATE restaurant.meals SET restaurant.meals.price = ? WHERE meal_title=?;\";\r\n        PreparedStatement pStatement = connection.prepareStatement(setNewPrice);\r\n        pStatement.setInt(1, newPrice);\r\n        pStatement.setString(2, mealTitle);\r\n        pStatement.executeUpdate();\r\n        pStatement.close();\r\n\r\n//        UPDATE Restaurant.Meals SET Restaurant.Meals.Price = 100 WHERE Meal_id=70;\r\n    }\r\n\r\n    public static void renameMeal(Connection connection, String mealTitle, String newTitle) throws SQLException {\r\n        if(!isMealPresent(connection, mealTitle)) {System.out.println(\"This meal isn't exist\"); return;}\r\n\r\n        int mealId = getMealId(connection, mealTitle);\r\n\r\n        String setNewPrice = \"UPDATE restaurant.meals SET restaurant.meals.meal_title = ? WHERE id=?;\";\r\n        PreparedStatement pStatement = connection.prepareStatement(setNewPrice);\r\n        pStatement.setString(1, newTitle);\r\n        pStatement.setInt(2, mealId);\r\n        pStatement.executeUpdate();\r\n        pStatement.close();\r\n    }\r\n\r\n    public static void findMeal(Connection connection, String mealTitle) throws SQLException{\r\n        if(!isMealPresent(connection, mealTitle)) {System.out.println(\"This meal isn't exist\"); return;}\r\n\r\n        ResultSet rs = searchOfMeal(connection, mealTitle);\r\n        outputOnDisplay(rs);\r\n        rs.close();\r\n    }\r\n\r\n    public static void removeMeal(Connection connection, String mealTitle) throws SQLException{\r\n        if(!isMealPresent(connection, mealTitle)) {System.out.println(\"This meal isn't exist\"); return;}\r\n\r\n        int mealIndex = getMealId(connection, mealTitle);\r\n\r\n        String removeMeal = \"DELETE FROM restaurant.meals WHERE id=?\";\r\n        PreparedStatement pStatement = connection.prepareStatement(removeMeal);\r\n        pStatement.setInt(1, mealIndex);\r\n        pStatement.executeUpdate();\r\n        pStatement.close();\r\n    }\r\n\r\n    public static void addToDatabase(Connection connection, Meal meal, int mealTypeId) throws SQLException {\r\n        String addNewMeal = \"INSERT INTO Restaurant.Meals(meal_title, price, meal_type_id) VALUES (?, ?, ?);\";\r\n        PreparedStatement pStatement = connection.prepareStatement(addNewMeal);\r\n        pStatement.setString(1, meal.getMealTitle());\r\n        pStatement.setInt(2, meal.getPrice());\r\n        pStatement.setInt(3, (mealTypeId));\r\n        pStatement.executeUpdate();\r\n        pStatement.close();\r\n    }\r\n\r\n    public static int getMealId(Connection connection, String mealTitle) throws SQLException{\r\n        int mealIndex = 0;\r\n        ResultSet rs = searchOfMeal(connection, mealTitle);\r\n        while (rs.next()){\r\n            mealIndex = rs.getInt(\"id\");\r\n        }\r\n\r\n        return mealIndex;\r\n    }\r\n\r\n    public static int getMealPrice(Connection connection, String mealTitle) throws SQLException{\r\n        int mealPrice = 0;\r\n        ResultSet rs = searchOfMeal(connection, mealTitle);\r\n        while (rs.next()){\r\n            mealPrice = rs.getInt(\"price\");\r\n        }\r\n\r\n        return mealPrice;\r\n    }\r\n\r\n    public static int getMealTypeId(Connection connection, MealType mealType) throws SQLException {\r\n        String getMealTypeIndex = \"SELECT id FROM restaurant.meal_type WHERE meal_type='\"+mealType.getReadableName()+\"';\";\r\n        Statement statement = connection.createStatement();\r\n        ResultSet resultSet = statement.executeQuery(getMealTypeIndex);\r\n        resultSet.next();\r\n\r\n        return resultSet.getInt(1);\r\n    }\r\n\r\n    public static ResultSet searchOfMeal(Connection connection, String MealTitle) throws SQLException {\r\n        String searchOfMeal = \"SELECT * FROM restaurant.meals WHERE meal_title=\\\"\"+MealTitle+\"\\\"\";\r\n        Statement statement = connection.createStatement();\r\n        ResultSet resultSet = statement.executeQuery(searchOfMeal);\r\n\r\n        return resultSet;\r\n    }\r\n\r\n    public static boolean isMealPresent(Connection connection, String MealTitle) throws SQLException{\r\n        boolean result = true;\r\n        while(!searchOfMeal(connection, MealTitle).next()) {\r\n\r\n            return result = false;\r\n        }\r\n\r\n        return result;\r\n    }\r\n\r\n    public static void outputOnDisplay(ResultSet rs) throws SQLException{\r\n        while (rs.next()){\r\n            System.out.println(\"Meal Title: \"+rs.getString(\"meal_title\")+\r\n                    \"\\nPrice: \"+rs.getInt(\"price\")+\"\\n\");\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/Sasha/Sasha.java b/src/main/java/Sasha/Sasha.java
+--- a/src/main/java/Sasha/Sasha.java	(revision b3be8d9a6a6668ac327382cca2657677eb7ebc7c)
++++ b/src/main/java/Sasha/Sasha.java	(date 1665522258228)
+@@ -3,27 +3,91 @@
+ import java.sql.*;
+ 
+ public class Sasha {
+-//                      - getTop10ClosedOrdersDesc()
+-//						- SortWaitersBySumRevenueDESC()
+-//						- getMeanClosedOrders() \\ avg
+-//						* theMostPopularMealsDESC() - count
++
++    public static void theMostPopularMealsDESC(Connection connection) throws SQLException{
++        String mostPopularMeal = "SELECT meal_title, count(quantity_of_meals) FROM restaurant.orders_items \n" +
++                "INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id\n" +
++                "GROUP BY meal_id ORDER BY count(quantity_of_meals) DESC LIMIT 5;";
++
++        Statement statement = connection.createStatement();
++        ResultSet resultSet = statement.executeQuery(mostPopularMeal);
++
++        while (resultSet.next()) {
++            if(resultSet.getInt(2) > 1) {
++                System.out.print("\""+resultSet.getString(1)+"\"");
++                System.out.println(", amount of orders: " + resultSet.getInt(2));
++            }
++        }
++    }
++    public  static  void getMeanClosedOrders(Connection connection) throws SQLException{
++        String getClosedOrders = "SELECT ROUND(SUM(price*quantity_of_meals),2) " +
++                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
++                " ON orders.id = orders_items.order_id WHERE status=\"closed\" GROUP BY order_id";
++
++        Statement statement = connection.createStatement();
++        ResultSet resultSet = statement.executeQuery(getClosedOrders);
+ 
+-    public static void getTop10ClosedOrdersDesc(){
+-        String findCloseOrders = "SELECT orders.id, orders_items.meal_id, orders_items.quantity_of_meals FROM orders LEFT JOIN orders_items ON orders.id = orders_items.order_id WHERE orders.status=\"Close\";";
++        double countRow = 0;
++        double amount = 0;
++
++        while (resultSet.next()) {
++            amount += resultSet.getDouble(1);
++            countRow ++;
++        }
++
++        System.out.println("Average closed check "+amount/countRow);
++    }
++    public static void sortWaitersBySumRevenueDESC(Connection connection) throws SQLException{
++        String sortWaitersByRevenueDESC = "SELECT waiters.name, waiters.surname, ROUND(SUM(price*quantity_of_meals),2)\n" +
++                " FROM restaurant.waiters INNER JOIN restaurant.tables ON waiters.id = tables.waiter_id\n" +
++                " INNER JOIN restaurant.orders ON orders.tables_id = tables.id \n" +
++                " INNER JOIN restaurant.orders_items ON orders_items.order_id = orders.id\n" +
++                " INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id\n" +
++                " GROUP BY waiters.id ORDER BY ROUND(SUM(price*quantity_of_meals),2) DESC;";
++
++        Statement statement = connection.createStatement();
++        ResultSet resultSet = statement.executeQuery(sortWaitersByRevenueDESC);
++
++        while (resultSet.next()) {
++            System.out.print(resultSet.getString(1));
++            System.out.print(" " + resultSet.getString(2));
++            System.out.println("   Total amount: " + resultSet.getDouble(3));
++        }
++    }
++
++    public static void getTop10ClosedOrdersDesc(Connection connection) throws SQLException{
++        String Top10ClosedOrdersDesc = "SELECT order_id, restaurant.orders.tables_id, restaurant.orders.status, ROUND(SUM(price*quantity_of_meals),2) " +
++                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
++                " ON orders.id = orders_items.order_id WHERE status=\"closed\" GROUP BY order_id ORDER BY ROUND(SUM(price*quantity_of_meals),2) DESC LIMIT 10";
++
++        Statement statement = connection.createStatement();
++        ResultSet resultSet = statement.executeQuery(Top10ClosedOrdersDesc);
++
++        while (resultSet.next()) {
++            System.out.print("Total amount: " + resultSet.getDouble(4));
++            System.out.print("   Order ID: " + resultSet.getInt(1));
++            System.out.print("  Table ID: " + resultSet.getInt(2));
++            System.out.println("  Status: " + resultSet.getString(3));
++        }
+     }
+     public static void main(String[] args) throws SQLException {
+         Connection connection =
+                 DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "sadomazo911");
+ 
+-        addMeal(connection, "lazania", 5, MealType.MAIN_COURSES);
+-        findMeal(connection, "lazania");
+-        setNewPrice(connection, "lazania", 100);
+-        findMeal(connection, "lazania");
+-        renameMeal(connection, "lazania", "lasagna");
+-        findMeal(connection, "lazania");
+-        findMeal(connection, "lasagna");
+-        removeMeal(connection, "lazania");
+-        removeMeal(connection, "lasagna");
++//        addMeal(connection, "lazania", 5, MealType.MAIN_COURSES);
++//        findMeal(connection, "lazania");
++//        setNewPrice(connection, "lazania", 100);
++//        findMeal(connection, "lazania");
++//        renameMeal(connection, "lazania", "lasagna");
++//        findMeal(connection, "lazania");
++//        findMeal(connection, "lasagna");
++//        removeMeal(connection, "lazania");
++//        removeMeal(connection, "lasagna");
++
++        getTop10ClosedOrdersDesc(connection);
++        sortWaitersBySumRevenueDESC(connection);
++        getMeanClosedOrders(connection);
++        theMostPopularMealsDESC(connection);
+     }
+ 
+     public static void addMeal(Connection connection, String mealTitle, int price, MealType mealType) throws SQLException{
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"09ab8526-b3b3-4546-888f-8a253002f437\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/Lena.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/Lena.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_TAGS\">\r\n      <GitPushTagMode>\r\n        <option name=\"argument\" value=\"--tags\" />\r\n        <option name=\"title\" value=\"All\" />\r\n      </GitPushTagMode>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"ProjectErrors\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FrQvFFUkO02JFtiI9cDCSj8cLr\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"Application.Lena\">\r\n    <configuration name=\"Lena\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"Lena\" />\r\n      <module name=\"restaurant_project\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"Maryia\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"Maryia\" />\r\n      <module name=\"restaurant_project\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"TestByLena\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"TestByLena\" />\r\n      <module name=\"restaurant_project\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.TestByLena\" />\r\n        <item itemvalue=\"Application.Lena\" />\r\n        <item itemvalue=\"Application.Maryia\" />\r\n        <item itemvalue=\"Application.Lena\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"09ab8526-b3b3-4546-888f-8a253002f437\" name=\"Changes\" comment=\"\" />\r\n      <created>1665247952999</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1665247952999</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"first commit\">\r\n      <created>1665248105477</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665248105477</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"master commit test\">\r\n      <created>1665426121970</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665426121970</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"master commit test\">\r\n      <created>1665426244553</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665426244553</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"master commit test\">\r\n      <created>1665426322730</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665426322731</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"first steps in project\">\r\n      <created>1665441986694</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665441986695</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"first steps in project\">\r\n      <created>1665472227450</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665472227451</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"first steps in project\">\r\n      <created>1665474870464</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665474870464</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"8\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"first commit\" />\r\n    <MESSAGE value=\"master commit test\" />\r\n    <MESSAGE value=\"first steps in project\" />\r\n    <MESSAGE value=\"2nd commit by Jelena (small correction of 7th method)\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"2nd commit by Jelena (small correction of 7th method)\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision b3be8d9a6a6668ac327382cca2657677eb7ebc7c)
++++ b/.idea/workspace.xml	(date 1665518580186)
+@@ -5,9 +5,10 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-10-11_14_08__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-10-11_14_08__Changes_.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/Lena.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Lena.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/Maryia.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Maryia.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/Sasha/Sasha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Sasha/Sasha.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -34,7 +35,7 @@
+     <option name="stateVersion" value="1" />
+   </component>
+   <component name="ProblemsViewState">
+-    <option name="selectedTabId" value="ProjectErrors" />
++    <option name="selectedTabId" value="CurrentFile" />
+   </component>
+   <component name="ProjectId" id="2FrQvFFUkO02JFtiI9cDCSj8cLr" />
+   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+@@ -42,7 +43,7 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="RunManager" selected="Application.Lena">
++  <component name="RunManager" selected="Application.Sasha">
+     <configuration name="Lena" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="Lena" />
+       <module name="restaurant_project" />
+@@ -57,6 +58,19 @@
+         <option name="Make" enabled="true" />
+       </method>
+     </configuration>
++    <configuration name="Sasha" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="Sasha.Sasha" />
++      <module name="restaurant_project" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="Sasha.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
+     <configuration name="TestByLena" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="TestByLena" />
+       <module name="restaurant_project" />
+@@ -66,6 +80,7 @@
+     </configuration>
+     <recent_temporary>
+       <list>
++        <item itemvalue="Application.Sasha" />
+         <item itemvalue="Application.TestByLena" />
+         <item itemvalue="Application.Lena" />
+         <item itemvalue="Application.Maryia" />
