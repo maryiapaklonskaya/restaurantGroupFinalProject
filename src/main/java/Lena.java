@@ -6,6 +6,9 @@ public class Lena {
     public static void main(String[] args) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/restaurant", "root", "jelenaandrejs");
+
+            //UNCOMMENT METHOD YOU WANT TO RUN:
+
             //reserveTable(connection);
             //unreserveTable(connection);
             //getAllMeals(connection);
@@ -170,7 +173,7 @@ public class Lena {
 
     public static void  getAllOrders (Connection connection) {
         String getOrders = "SELECT restaurant.orders.id AS 'Order_id', restaurant.orders.tables_id, restaurant.orders.status, SUM(meals.price*quantity_of_meals) AS 'Total_Amount' \n" +
-                "FROM restaurant.orders LEFT JOIN restaurant.orders_items ON orders.id = restaurant.orders_items.id" +
+                "FROM restaurant.orders LEFT JOIN restaurant.orders_items ON restaurant.orders.id = restaurant.orders_items.order_id" +
                 " INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id ORDER BY orders.id;";
 
 
