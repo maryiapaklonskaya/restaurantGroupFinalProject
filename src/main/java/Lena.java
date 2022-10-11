@@ -172,9 +172,9 @@ public class Lena {
     }
 
     public static void  getAllOrders (Connection connection) {
-        String getOrders = "SELECT restaurant.orders.id AS 'Order_id', restaurant.orders.tables_id, restaurant.orders.status, SUM(meals.price*quantity_of_meals) AS 'Total_Amount' \n" +
-                "FROM restaurant.orders LEFT JOIN restaurant.orders_items ON restaurant.orders.id = restaurant.orders_items.order_id" +
-                " INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id ORDER BY orders.id;";
+        String getOrders = "SELECT order_id, restaurant.orders.tables_id, restaurant.orders.status, ROUND(SUM(price*quantity_of_meals),2) " +
+                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
+                " ON orders.id = orders_items.order_id GROUP BY order_id";
 
 
         try {
