@@ -1,5 +1,4 @@
-package Restaurant;
-import Restaurant.Enums.MealType;
+package Sasha;
 
 public class Meal {
     private String mealTitle;

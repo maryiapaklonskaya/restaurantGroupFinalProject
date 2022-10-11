@@ -1,0 +1,271 @@
+Index: src/main/java/Sasha/MealType.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Restaurant.Enums;\r\n\r\npublic enum MealType {\r\n    APPETIZERS(\"appetizers\"),\r\n    MAIN_COURSES(\"main courses\"),\r\n    SIDE_DISHES(\"side dishes\"),\r\n    VEGETARIAN_MENU(\"vegetarian menu\"),\r\n    SOUP(\"soup\"),\r\n    DESSERT(\"dessert\"),\r\n    CHILDREN_MEAL(\"children meal\"),\r\n    NON_ALCOHOLIC_DRINK(\"non alcoholic drink\"),\r\n    ALCOHOLIC_DRINK(\"alcoholic drink\");\r\n\r\n    private final String readableName;\r\n\r\n    MealType(final String readableName) {\r\n        this.readableName = readableName;\r\n    }\r\n\r\n    public String getReadableName(){\r\n        return readableName;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/Sasha/MealType.java b/src/main/java/Sasha/MealType.java
+--- a/src/main/java/Sasha/MealType.java	(revision f1c2ac0b180d2417865908b6b6c637c0fcc52b53)
++++ b/src/main/java/Sasha/MealType.java	(date 1665428610184)
+@@ -1,4 +1,4 @@
+-package Restaurant.Enums;
++package Sasha;
+ 
+ public enum MealType {
+     APPETIZERS("appetizers"),
+Index: src/main/java/Sasha/Meal.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package Restaurant;\r\nimport Restaurant.Enums.MealType;\r\n\r\npublic class Meal {\r\n    private String mealTitle;\r\n    private int price;\r\n    private MealType mealType;\r\n\r\n    Meal(String mealTitle, int price, MealType mealType){\r\n        this.mealTitle = mealTitle;\r\n        this.price = price;\r\n        setMealType(mealType);\r\n    }\r\n\r\n    public String getMealTitle() {return mealTitle;}\r\n\r\n    public int getPrice() {return price;}\r\n\r\n    public void setMealType(MealType mealType){\r\n        this.mealType = mealType;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/Sasha/Meal.java b/src/main/java/Sasha/Meal.java
+--- a/src/main/java/Sasha/Meal.java	(revision f1c2ac0b180d2417865908b6b6c637c0fcc52b53)
++++ b/src/main/java/Sasha/Meal.java	(date 1665428668234)
+@@ -1,5 +1,4 @@
+-package Restaurant;
+-import Restaurant.Enums.MealType;
++package Sasha;
+ 
+ public class Meal {
+     private String mealTitle;
+Index: src/main/java/Sasha/Sasha.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>public class Sasha {\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/Sasha/Sasha.java b/src/main/java/Sasha/Sasha.java
+--- a/src/main/java/Sasha/Sasha.java	(revision f1c2ac0b180d2417865908b6b6c637c0fcc52b53)
++++ b/src/main/java/Sasha/Sasha.java	(date 1665429350060)
+@@ -1,4 +1,140 @@
++package Sasha;
++
++import java.sql.*;
++
+ public class Sasha {
+ 
++    public static void main(String[] args) throws SQLException {
++        Connection connection =
++                DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "root", "sadomazo911");
++
++        addMeal(connection, "lazania", 5, MealType.MAIN_COURSES);
++        findMeal(connection, "lazania");
++        setNewPrice(connection, "lazania", 100);
++        findMeal(connection, "lazania");
++        renameMeal(connection, "lazania", "lasagna");
++        findMeal(connection, "lazania");
++        findMeal(connection, "lasagna");
++        removeMeal(connection, "lazania");
++        removeMeal(connection, "lasagna");
++    }
++
++    public static void addMeal(Connection connection, String mealTitle, int price, MealType mealType) throws SQLException{
++        if(isMealPresent(connection, mealTitle)) {System.out.println("This meal already exist");  return;}
++
++        Meal meal = new Meal(mealTitle, price, mealType);
++        int mealTypeId = getMealTypeId(connection, mealType);
++
++        addToDatabase(connection, meal, mealTypeId);
++    }
++
++    public static void setNewPrice(Connection connection, String mealTitle, int newPrice) throws SQLException {
++        if(!isMealPresent(connection, mealTitle)) {System.out.println("This meal isn't exist"); return;}
++
++        String setNewPrice = "UPDATE restaurant.meals SET restaurant.meals.price = ? WHERE meal_title=?;";
++        PreparedStatement pStatement = connection.prepareStatement(setNewPrice);
++        pStatement.setInt(1, newPrice);
++        pStatement.setString(2, mealTitle);
++        pStatement.executeUpdate();
++        pStatement.close();
++
++//        UPDATE Restaurant.Meals SET Restaurant.Meals.Price = 100 WHERE Meal_id=70;
++    }
++
++    public static void renameMeal(Connection connection, String mealTitle, String newTitle) throws SQLException {
++        if(!isMealPresent(connection, mealTitle)) {System.out.println("This meal isn't exist"); return;}
++
++        int mealId = getMealId(connection, mealTitle);
++
++        String setNewPrice = "UPDATE restaurant.meals SET restaurant.meals.meal_title = ? WHERE id=?;";
++        PreparedStatement pStatement = connection.prepareStatement(setNewPrice);
++        pStatement.setString(1, newTitle);
++        pStatement.setInt(2, mealId);
++        pStatement.executeUpdate();
++        pStatement.close();
++    }
+ 
++    public static void findMeal(Connection connection, String mealTitle) throws SQLException{
++        if(!isMealPresent(connection, mealTitle)) {System.out.println("This meal isn't exist"); return;}
++
++        ResultSet rs = searchOfMeal(connection, mealTitle);
++        outputOnDisplay(rs);
++        rs.close();
++    }
++
++    public static void removeMeal(Connection connection, String mealTitle) throws SQLException{
++        if(!isMealPresent(connection, mealTitle)) {System.out.println("This meal isn't exist"); return;}
++
++        int mealIndex = getMealId(connection, mealTitle);
++
++        String removeMeal = "DELETE FROM restaurant.meals WHERE id=?";
++        PreparedStatement pStatement = connection.prepareStatement(removeMeal);
++        pStatement.setInt(1, mealIndex);
++        pStatement.executeUpdate();
++        pStatement.close();
++    }
++
++    public static void addToDatabase(Connection connection, Meal meal, int mealTypeId) throws SQLException {
++        String addNewMeal = "INSERT INTO Restaurant.Meals(meal_title, price, meal_type_id) VALUES (?, ?, ?);";
++        PreparedStatement pStatement = connection.prepareStatement(addNewMeal);
++        pStatement.setString(1, meal.getMealTitle());
++        pStatement.setInt(2, meal.getPrice());
++        pStatement.setInt(3, (mealTypeId));
++        pStatement.executeUpdate();
++        pStatement.close();
++    }
++
++    public static int getMealId(Connection connection, String mealTitle) throws SQLException{
++        int mealIndex = 0;
++        ResultSet rs = searchOfMeal(connection, mealTitle);
++        while (rs.next()){
++            mealIndex = rs.getInt("id");
++        }
++
++        return mealIndex;
++    }
++
++    public static int getMealPrice(Connection connection, String mealTitle) throws SQLException{
++        int mealPrice = 0;
++        ResultSet rs = searchOfMeal(connection, mealTitle);
++        while (rs.next()){
++            mealPrice = rs.getInt("price");
++        }
++
++        return mealPrice;
++    }
++
++    public static int getMealTypeId(Connection connection, MealType mealType) throws SQLException {
++        String getMealTypeIndex = "SELECT id FROM restaurant.meal_type WHERE meal_type='"+mealType.getReadableName()+"';";
++        Statement statement = connection.createStatement();
++        ResultSet resultSet = statement.executeQuery(getMealTypeIndex);
++        resultSet.next();
++
++        return resultSet.getInt(1);
++    }
++
++    public static ResultSet searchOfMeal(Connection connection, String MealTitle) throws SQLException {
++        String searchOfMeal = "SELECT * FROM restaurant.meals WHERE meal_title=\""+MealTitle+"\"";
++        Statement statement = connection.createStatement();
++        ResultSet resultSet = statement.executeQuery(searchOfMeal);
++
++        return resultSet;
++    }
++
++    public static boolean isMealPresent(Connection connection, String MealTitle) throws SQLException{
++        boolean result = true;
++        while(!searchOfMeal(connection, MealTitle).next()) {
++
++            return result = false;
++        }
++
++        return result;
++    }
++
++    public static void outputOnDisplay(ResultSet rs) throws SQLException{
++        while (rs.next()){
++            System.out.println("Meal Title: "+rs.getString("meal_title")+
++                    "\nPrice: "+rs.getInt("price")+"\n");
++        }
++    }
+ }
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"09ab8526-b3b3-4546-888f-8a253002f437\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/Orders.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/Orders.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_TAGS\">\r\n      <GitPushTagMode>\r\n        <option name=\"argument\" value=\"--tags\" />\r\n        <option name=\"title\" value=\"All\" />\r\n      </GitPushTagMode>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"ProjectErrors\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FrQvFFUkO02JFtiI9cDCSj8cLr\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;\r\n  }\r\n}</component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"09ab8526-b3b3-4546-888f-8a253002f437\" name=\"Changes\" comment=\"\" />\r\n      <created>1665247952999</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1665247952999</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"first commit\">\r\n      <created>1665248105477</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665248105477</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"master commit test\">\r\n      <created>1665426121970</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665426121970</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"master commit test\">\r\n      <created>1665426244553</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665426244553</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"first commit\" />\r\n    <MESSAGE value=\"master commit test\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"master commit test\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision f1c2ac0b180d2417865908b6b6c637c0fcc52b53)
++++ b/.idea/workspace.xml	(date 1665429404619)
+@@ -4,8 +4,11 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/src/main/java/Orders.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Orders.java" afterDir="false" />
++    <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="first commit">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/Sasha/Meal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Sasha/Meal.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/Sasha/MealType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Sasha/MealType.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/Sasha/Sasha.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Sasha/Sasha.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -40,12 +43,38 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
+-  }
+-}</component>
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "SHARE_PROJECT_CONFIGURATION_FILES": "true"
++  }
++}]]></component>
++  <component name="RecentsManager">
++    <key name="CopyClassDialog.RECENTS_KEY">
++      <recent name="Sasha" />
++    </key>
++  </component>
++  <component name="RunManager">
++    <configuration name="Sasha" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="Sasha.Sasha" />
++      <module name="restaurant_project" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="Sasha.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <recent_temporary>
++      <list>
++        <item itemvalue="Application.Sasha" />
++      </list>
++    </recent_temporary>
++  </component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+     <task active="true" id="Default" summary="Default task">
+@@ -78,6 +107,17 @@
+     </task>
+     <option name="localTasksCounter" value="4" />
+     <servers />
++  </component>
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="TAB_STATES">
++      <map>
++        <entry key="MAIN">
++          <value>
++            <State />
++          </value>
++        </entry>
++      </map>
++    </option>
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="first commit" />

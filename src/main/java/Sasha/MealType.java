@@ -1,4 +1,4 @@
-package Restaurant.Enums;
+package Sasha;
 
 public enum MealType {
     APPETIZERS("appetizers"),
