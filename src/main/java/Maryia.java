@@ -61,22 +61,22 @@ public class Maryia {
             e.printStackTrace();
         }
 
-        if (!(resultSet == null)){
-
-        }
-
-        while (resultSet.next()) {
-            userName = resultSet.getString(1);
-            if (!(resultSet == null)) {
-                welcomeWaitersScreen(connection, userName);
-            } else {
-                System.out.print("There is no such user, please try again");
-                welcomeScreen(connection);
+//        if (!(resultSet == null)){
+//
+//        }
+//
+//        while (resultSet.next()) {
+//            userName = resultSet.getString(1);
+//            if (!(resultSet == null)) {
+//                welcomeWaitersScreen(connection, userName);
+//            } else {
+//                System.out.print("There is no such user, please try again");
+//                welcomeScreen(connection);
             }
+//
+//            return userName;
 
-            return userName;
-        }
-    }
+
 
     public static void welcomeWaitersScreen(Connection connection, String userName){
         Scanner scan = new Scanner(System.in);
