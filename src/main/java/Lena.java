@@ -6,7 +6,14 @@ public class Lena {
     public static void main(String[] args) {
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/restaurant", "root", "jelenaandrejs");
-          getAllOrders(connection);
+            //reserveTable(connection);
+            //unreserveTable(connection);
+            //getAllMeals(connection);
+            //viewAllMealsByType(connection);
+            //getAllWaiters(connection);
+            //addWaiter(connection);
+            //removeWaiter(connection);
+            //getAllOrders(connection);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -181,7 +188,6 @@ public class Lena {
             e.printStackTrace();
         }
     }
-
 
 
 }
