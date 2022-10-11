@@ -52,7 +52,7 @@ public class Maryia {
         String checkUserID = "SELECT restaurant.checkUserID(" + authID + ");";
         String userName = "";
 
-         //resultSet = null;
+        //resultSet = null;
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(checkUserID);
@@ -60,6 +60,8 @@ public class Maryia {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return userName;
+    }
 
 //        if (!(resultSet == null)){
 //
@@ -72,7 +74,7 @@ public class Maryia {
 //            } else {
 //                System.out.print("There is no such user, please try again");
 //                welcomeScreen(connection);
-            }
+//            }
 //
 //            return userName;
 
