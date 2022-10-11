@@ -94,7 +94,7 @@ public class Maryia {
     public static void waitersChoice(Connection connection, int authID) {
         Scanner scan = new Scanner(System.in);
 
-        System.out.println("\nWhat do you want to do next?\n1. View Menu\n2. Create or edit order");
+        System.out.println("\nWhat do you want to do next?\n1. View Menu\n2. Create order or edit order");
         int waitersChoice = scan.nextInt();
         if (waitersChoice == 1) {
             System.out.println("Here is a menu:\nMealName\t\t\t\tCategory\t\t\t\tPrice");
@@ -140,6 +140,9 @@ public class Maryia {
                 "//2. Edit order by ID\n" +
                 "//3. Cancel order отменить заказ (статус кансселлед) + разбронировать столик\n" +
                 "//4. Close order закрыть ордер  (статус closed) + разбронировать столик\n");
+
+        "1. Create an order  2. Edit existing order  3. Cancel order  4. Close order  " +
+                "5. Create a checque \n 6. Reserve table  7. Take off reservation  8. View all meals  9. View all meals by type" );
 
 //        switch (order_id_inserted) {
 //            case 1:
