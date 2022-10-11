@@ -7,8 +7,6 @@ import java.util.Scanner;
 public class Maryia {
 
 
-
-
 //    если ок ---> 0. viewAllMealsByType()
 //					1. создать заказ() + бронировать столик вместе
 //
@@ -21,59 +19,78 @@ public class Maryia {
 //									- createСheсk()
 //								* вернуться назад
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/library", "root", "rootroot");
-            createUser(connection);
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/restaurant", "root", "rootroot");
+            welcomeScreen(connection);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        //welcomeScreen();
 
     }
 
-    public static void welcomeScreen(){
+    public static void welcomeScreen(Connection connection) {
         Scanner scan = new Scanner(System.in);
 
-        System.out.println("Welcome to the Restaurant System made by Sasha, Lena and Masha. \n FOR WAITERS: Please insert your personal ID. \n FOR ADMINS: Press 0. ");
+        System.out.println("Welcome to the Restaurant System made by Sasha, Lena and Masha. \nFOR WAITERS: Please insert your personal ID. \nFOR ADMINS: Press 0. ");
         int authID = scan.nextInt();
 
-        checkWaiterExists(authID);
-        public static String checkWaiterExists(Connection connection, int authID){
-            String checkUserID = "SELECT restaurant.checkUserID(" + authID + ");";
-
-            try {
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(checkUserID);
-                if(!(resultSet == null)){
-                    String userName = resultSet.getString(1);
-                }
-
-                while (resultSet.next()) {
-                    System.out.print(resultSet.getInt(1) + "   ");
-                System.out.print(resultSet.getString(2) + "\t");
-                System.out.println(resultSet.getInt(3));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (authID == 0) {
+            welcomeAdminScreen(connection);
+        } else {
+            checkWaiterExists(connection, authID);
         }
 
-        GET ALL USERS BY ID AND NAME
-
-        switch(firstChoice){
-            case(0): ;
-            case(): ;
-            case(0): ;
-            default
-        }
-
-
-        System.out.println("Select table number, if the order to go - press 0");
 
         // SHOW LIST OF AVAILABLE (NOT BOOKED) TABLES
 
 
     }
+
+    public static String checkWaiterExists(Connection connection, int authID) {
+        String checkUserID = "SELECT restaurant.checkUserID(" + authID + ");";
+        String userName = "";
+
+         //resultSet = null;
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(checkUserID);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (!(resultSet == null)){
+
+        }
+
+        while (resultSet.next()) {
+            userName = resultSet.getString(1);
+            if (!(resultSet == null)) {
+                welcomeWaitersScreen(connection, userName);
+            } else {
+                System.out.print("There is no such user, please try again");
+                welcomeScreen(connection);
+            }
+
+            return userName;
+        }
+    }
+
+    public static void welcomeWaitersScreen(Connection connection, String userName){
+        Scanner scan = new Scanner(System.in);
+
+        System.out.println(userName + ", welcome to the Waiter Side of the Restaurant System. \nChoose what do you want to do:");
+        int authID = scan.nextInt();
+    }
+
+    public static void welcomeAdminScreen(Connection connection) {
+        Scanner scan = new Scanner(System.in);
+
+        System.out.println("Welcome to the Admin Side of the Restaurant System. \nChoose what do you want to do:");
+        int authID = scan.nextInt();
+
+    }
 }
+
