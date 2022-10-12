@@ -1,7 +1,12 @@
 package Restaurant_Project_final;
 
+import Sasha.Meal;
+
 import java.sql.*;
+import java.util.HashSet;
 import java.util.Scanner;
+
+import static Sasha.Sasha.*;
 
 public class Main {
 
@@ -129,7 +134,8 @@ public class Main {
                 4. Close order
                 5. Create a cheque
                 6. Reserve table
-                7. Take off reservation""");
+                7. Take off reservation
+                0. Exit System""");
 
 
         int choice = scan.nextInt();
@@ -174,6 +180,9 @@ public class Main {
             case 7 ->
                 //7. Take off reservation
                     unreserveTable(connection);
+            case 0 ->
+                //8. Exit System
+                    welcomeScreen(connection);
             default -> {
                 System.out.println(" ---> There is no such option, please choose another one <--- ");
                 waitersChoice(connection, authID);
@@ -346,7 +355,7 @@ public class Main {
 
         System.out.println("Table No" + tableNum + " was reserved.");
 
-        welcomeScreen(connection);
+        waitersChoice(connection, authID);
 
     }
 
@@ -382,7 +391,7 @@ public class Main {
 
         System.out.println("Table No" + tableNum + " was unreserved.");
 
-        welcomeScreen(connection);
+        waitersChoice(connection, authID);
 
     }
 
@@ -476,7 +485,7 @@ public class Main {
     public static void viewOrderByID(Connection connection, int orderID){
         String getOrder = "SELECT order_id, restaurant.orders.tables_id, restaurant.orders.status, ROUND(SUM(price*quantity_of_meals),2) " +
                 " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
-                " ON orders.id = orders_items.order_id WHERE order_id = " + orderID + " GROUP BY order_id";
+                " ON orders.id = orders_items.order_id WHERE order_id = " + orderID;
 
         try {
             Statement statement = connection.createStatement();
@@ -520,9 +529,7 @@ public class Main {
                 21. View All Orders
                 22. View Top Popular Meals 
                 23. View the Most Productive Waiters
-                24. Show Mean Revenue of Closed Orders;
-                
-                """);
+                24. Show Mean Revenue of Closed Orders;""");
 
         int choice = scan.nextInt();
 
@@ -536,15 +543,40 @@ public class Main {
                 welcomeAdminScreen(connection);
             }
             case 3 -> {
+                try {
+                    scannerAddMeal(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                welcomeAdminScreen(connection);
 
             }
             case 4 -> {
+                try {
+                    removeMeal(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                welcomeAdminScreen(connection);
 
             }
             case 5 -> {
+                try {
+                    setNewPrice(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+                welcomeAdminScreen(connection);
 
             }
             case 6 -> {
+                try {
+                    renameMeal(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                welcomeAdminScreen(connection);
 
             }
             case 11 -> {
@@ -556,6 +588,7 @@ public class Main {
                 welcomeAdminScreen(connection);
             }
             case 13 -> {
+                getAllWaiters(connection);
                 removeWaiter(connection);
                 welcomeAdminScreen(connection);
             }
@@ -653,7 +686,7 @@ public class Main {
 
     public static void removeWaiter(Connection connection){
 
-        System.out.println("Please enter waiter id: ");
+        System.out.println("Please enter waiter id to remove it: ");
         Scanner scanner = new Scanner(System.in);
         int id = scanner.nextInt();
 
@@ -691,6 +724,124 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void scannerAddMeal(Connection connection) throws SQLException {
+        HashSet<Integer> mealId = getAllMealsId(connection);
+
+        Scanner helloWorld = new Scanner(System.in);
+        System.out.println("\nEnter meal name: ");
+        String mealName = helloWorld.nextLine();
+
+        int mealTypeId = scannerChooseMealTypeID(connection);
+        if(!mealId.contains(mealTypeId)) { System.out.println("Please enter an existing id"); return;}
+
+        System.out.println("\nEnter price: ");
+        int mealPrice = helloWorld.nextInt();
+//        тут можно проверку на ввод сделать, но я пока думаю над этим
+
+        addMeal(connection, mealName, mealPrice, mealTypeId);
+    }
+
+    public static HashSet getAllMealsId(Connection connection) throws SQLException{
+        HashSet<Integer> mealId = new HashSet<>();
+
+        String id = "SELECT id FROM restaurant.meal_type";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(id);
+
+        while (resultSet.next()) {
+            mealId.add(resultSet.getInt(1));
+        }
+        return mealId;
+    }
+
+    public static int scannerChooseMealTypeID(Connection connection) throws SQLException{
+        String mealType = "SELECT id, meal_type FROM restaurant.meal_type";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(mealType);
+        onDisplayMealType(resultSet);
+
+        Scanner helloWorld = new Scanner(System.in);
+
+        System.out.println("\nEnter the Id the dish belongs to: ");
+        int mealTypeId = helloWorld.nextInt();
+        helloWorld.nextLine();
+
+        return mealTypeId;
+    }
+
+    public static void addMeal(Connection connection, String mealTitle, int price, int mealTypeId) throws SQLException{
+        if(isMealPresent(connection, mealTitle)) {System.out.println("This meal already exist");  return;}
+
+        Meal meal = new Meal(mealTitle, price, mealTypeId);
+
+        addToDatabase(connection, meal, mealTypeId);
+    }
+
+    public static void setNewPrice(Connection connection) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Please enter title of the meal you want to change the price for: ");
+        String mealTitle = scanner.nextLine();
+        System.out.println("Please enter new price of the meal: " + mealTitle);
+        int newPrice = scanner.nextInt();
+
+        if(!isMealPresent(connection, mealTitle)) {System.out.println("This meal isn't exist"); return;}
+
+        String setNewPrice = "UPDATE restaurant.meals SET restaurant.meals.price = ? WHERE meal_title=?;";
+        PreparedStatement pStatement = connection.prepareStatement(setNewPrice);
+        pStatement.setInt(1, newPrice);
+        pStatement.setString(2, mealTitle);
+        pStatement.executeUpdate();
+        pStatement.close();
+
+        System.out.println("Price was changed.");
+
+//        UPDATE Restaurant.Meals SET Restaurant.Meals.Price = 100 WHERE Meal_id=70;
+    }
+
+    public static void removeMeal(Connection connection) throws SQLException{
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Please enter title of the meal you want to remove: ");
+        String mealTitletoRemove = scanner.nextLine();
+
+        if(!isMealPresent(connection, mealTitletoRemove)) {System.out.println("This meal isn't exist"); return;}
+
+        int mealIndex = getMealId(connection, mealTitletoRemove);
+
+        String removeMeal = "DELETE FROM restaurant.meals WHERE id=?";
+        PreparedStatement pStatement = connection.prepareStatement(removeMeal);
+        pStatement.setInt(1, mealIndex);
+        pStatement.executeUpdate();
+        pStatement.close();
+
+        System.out.println("Meal " + mealTitletoRemove + " was removed");
+    }
+
+    public static void renameMeal(Connection connection) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Please enter title of the meal you want to rename: ");
+        String mealTitletoRename = scanner.nextLine();
+        System.out.println("Please enter NEW title: ");
+        String newTitle = scanner.nextLine();
+
+        if(!isMealPresent(connection, mealTitletoRename)) {System.out.println("This meal isn't exist"); return;}
+
+        int mealId = getMealId(connection, mealTitletoRename);
+
+        String setNewTitle = "UPDATE restaurant.meals SET restaurant.meals.meal_title = ? WHERE id=?;";
+        PreparedStatement pStatement = connection.prepareStatement(setNewTitle);
+        pStatement.setString(1, newTitle);
+        pStatement.setInt(2, mealId);
+        pStatement.executeUpdate();
+        pStatement.close();
+
+        System.out.println("Meal" + mealTitletoRename + " was renamed to " + newTitle);
     }
 
 

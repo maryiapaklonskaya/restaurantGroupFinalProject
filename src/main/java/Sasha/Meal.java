@@ -7,7 +7,7 @@ public class Meal {
 
     private int mealTypeId;
 
-    Meal(String mealTitle, int price, int mealTypeId){
+    public Meal(String mealTitle, int price, int mealTypeId){
         this.mealTitle = mealTitle;
         this.price = price;
         this.mealTypeId = mealTypeId;
