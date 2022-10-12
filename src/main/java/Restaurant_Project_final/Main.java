@@ -8,8 +8,6 @@ public class Main {
     public static int authID = 0;
     public static String userName = "";
 
-    //EDITORDER NEEDS REVIEW
-
     public static void main(String[] args){
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/restaurant", "root", "rootroot");
@@ -24,7 +22,6 @@ public class Main {
 //            addMealsToTheOrder(connection, orderID);
 //            reserveTable(connection);
 //            unreserveTable(connection);
-//            editOrder(connection, orderID); !!!!! MAYBE DELETE???
 //            cancelOrder(connection, orderID);
 //            closeOrder(connection, orderID);
 //            viewOrderByID(connection, orderID);
@@ -57,7 +54,7 @@ public class Main {
 
     public static void welcomeScreen(Connection connection) {
         Scanner scan = new Scanner(System.in);
-        System.out.println("Welcome to the Restaurant System made by Sasha, Lena and Masha. \nFOR WAITERS: Please insert your personal ID. \nFOR ADMINS: Press 0. ");
+        System.out.println("\nWelcome to the Restaurant System made by Sasha, Lena and Masha. \nFOR WAITERS: Please insert your personal ID. \nFOR ADMINS: Press 0. ");
         authID = scan.nextInt();
         if (authID == 0) {
             welcomeAdminScreen(connection);
@@ -101,7 +98,7 @@ public class Main {
     }
 
     public static void  viewAllMealsByType (Connection connection) {
-        String viewMeals = "SELECT id, meal_type, meal_title, price FROM restaurant.meals INNER JOIN restaurant.meal_type ON meal_type.id = meals.meal_type_id ORDER BY meal_type";
+        String viewMeals = "SELECT meals.id, meal_type, meal_title, price FROM restaurant.meals INNER JOIN restaurant.meal_type ON meal_type.id = meals.meal_type_id ORDER BY meal_type";
 
         try {
             Statement statement = connection.createStatement();
@@ -128,19 +125,18 @@ public class Main {
 
                 1. View Menu
                 2. Create order
-                3. Edit order
-                4. Cancel order
-                5. Close order
-                6. Create a cheque
-                7. Reserve table
-                8. Take off reservation""");
+                3. Cancel order
+                4. Close order
+                5. Create a cheque
+                6. Reserve table
+                7. Take off reservation""");
 
 
         int choice = scan.nextInt();
         switch (choice) {
             case 1 -> {
                 //1. View Menu
-                System.out.println("Here is a menu:\nMealName\t\t\t\tCategory\t\t\t\tPrice");
+                System.out.println("Here is a menu:\nID\tCategory\t\t\t\t MealName\t\t\t\tPrice");
                 viewAllMealsByType(connection);
                 welcomeWaitersScreen(connection, userName);
             }
@@ -148,42 +144,35 @@ public class Main {
                 //2. Create order
                     createNewOrder(connection);
             case 3 -> {
-                //3. Edit order
+                //3. Cancel order
                 System.out.println("Here is a list of all your orders. " +
                         "Choose one and insert Order_id below.\nID   Table\t\t\tStatus");
                 getAllOrdersByWaiterID(connection, authID);
-                orderID = scan.nextInt();
-                editOrder(connection, orderID);
-            }
-            case 4 -> {
-                //4. Cancel order
-                System.out.println("Here is a list of all your orders. " +
-                        "Choose one and insert Order_id below.\nID   Table\t\t\tStatus");
-                getAllOrdersByWaiterID(connection, authID);
+                System.out.println("insert Order_id");
                 orderID = scan.nextInt();
                 cancelOrder(connection, orderID);
             }
-            case 5 -> {
-                //5. Close order
+            case 4 -> {
+                //4. Close order
                 System.out.println("Here is a list of all your orders. " +
                         "Choose one and insert Order_id below.\nID   Table\t\t\tStatus");
                 getAllOrdersByWaiterID(connection, authID);
                 orderID = scan.nextInt();
                 closeOrder(connection, orderID);
             }
-            case 6 -> {
-                //6. Create a cheque
+            case 5 -> {
+                //5. Create a cheque
                 System.out.println("Here is a list of all your orders. " +
                         "Choose one and insert Order_id below.\nID   Table\t\t\tStatus");
                 getAllOrdersByWaiterID(connection, authID);
                 orderID = scan.nextInt();
                 viewOrderByID(connection, orderID);
             }
-            case 7 ->
-                //7. Reserve table
+            case 6 ->
+                //6. Reserve table
                     reserveTable(connection);
-            case 8 ->
-                //8. Take off reservation
+            case 7 ->
+                //7. Take off reservation
                     unreserveTable(connection);
             default -> {
                 System.out.println(" ---> There is no such option, please choose another one <--- ");
@@ -217,11 +206,11 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         //FINDING AVAILABLE TABLES
-        String displayAvailableTables = "SELECT id, table_reserved FROM tables WHERE tables.table_reserved = 0";
+        String displayAvailableTables = "SELECT id, table_reserved FROM tables WHERE tables.table_reserved = 0 AND tables.waiter_id = " + authID;
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(displayAvailableTables);
-            System.out.println("Here is all available tables:\nid\t | table_reserved");
+            System.out.println("Here is all YOUR available tables:\nid\t | table_reserved");
 
             while (resultSet.next()) {
                 System.out.print(resultSet.getInt(1) + "\t");
@@ -255,9 +244,23 @@ public class Main {
             pStatement.setString(3, status);
             pStatement.setBoolean(4, payment_type);
             pStatement.executeUpdate();
+//System.out.println("update executed");
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        String reserve = "UPDATE restaurant.tables SET table_reserved = 1 WHERE id = ?";
+
+        try {
+            PreparedStatement pStatement = connection.prepareStatement(reserve);
+            pStatement.setInt(1, tables_id);
+
+            pStatement.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         //GETTING ORDER_ID
         int latestOrderId = 0;
@@ -268,11 +271,14 @@ public class Main {
             while (resultSet.next()) {
                 latestOrderId = resultSet.getInt(1);
             }
+//System.out.println("max order id" + latestOrderId);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         //ADDING MEALS TO THE ORDER
+//System.out.println("calling addmealstotheorder");
         addMealsToTheOrder(connection, latestOrderId);
     }
 
@@ -284,7 +290,7 @@ public class Main {
         int meal_id = scanner.nextInt();
         System.out.println("Please enter quantity of the meal " +meal_id +":");
         int quantity_of_meals = scanner.nextInt();
-        String addMeal = "INSERT INTO restaurant.orders_meals (meal_id, order_id, quantity_of_meals) VALUES (?, ?, ?)";
+        String addMeal = "INSERT INTO restaurant.orders_items (meal_id, order_id, quantity_of_meals) VALUES (?, ?, ?)";
 
         try {
             PreparedStatement pStatement = connection.prepareStatement(addMeal);
@@ -298,10 +304,10 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println("Order " + orderID + " has been created");
-        System.out.println("Do you want to add more meals? Type 'yes' or 'no'");
-        String repeatFunction = scanner.nextLine();
-        if(repeatFunction.equalsIgnoreCase("yes")){
+        System.out.println("Order " + orderID + " has been created and table was booked.");
+        System.out.println("Do you want to add more meals? Type 1 for 'yes' OR 0 for 'no'");
+        int repeatFunction = scanner.nextInt();
+        if(repeatFunction==1){
             addMealsToTheOrder(connection, orderID);
         } else {
             waitersChoice(connection, authID);
@@ -326,7 +332,7 @@ public class Main {
         System.out.println("Enter number of the table to reserve: ");
         Scanner scanner = new Scanner(System.in);
         int tableNum = scanner.nextInt();
-        String reserve = "UPDATE restaurant.tables SET table_reserved = true WHERE id = ?";
+        String reserve = "UPDATE restaurant.tables SET table_reserved = 1 WHERE id = ?";
 
         try {
             PreparedStatement pStatement = connection.prepareStatement(reserve);
@@ -380,16 +386,11 @@ public class Main {
 
     }
 
-    public static void editOrder(Connection connection, int orderID){
-        System.out.println("IN PROGRESS");
-        waitersChoice(connection, authID);
-    }
-
     public static void cancelOrder(Connection connection, int orderID){
         int tableID = 0;
-        String cancelOrder = "UPDATE restaurant.orders SET status = 'CANCELLED' WHERE id = ?";
+        String cancelOrder = "UPDATE restaurant.orders SET status = 'CANCEL' WHERE id = ?";
         String selectOrderTable = "SELECT tables_id FROM orders WHERE id = " + orderID;
-        String unreserveTable = "UPDATE restaurant.tables SET table_reserved = false WHERE id = ?";
+        String unreserveTable = "UPDATE restaurant.tables SET table_reserved = 0 WHERE id = ?";
 
         try {
             PreparedStatement pStatement = connection.prepareStatement(cancelOrder);
@@ -432,7 +433,7 @@ public class Main {
         int tableID = 0;
         String closeOrder = "UPDATE restaurant.orders SET status = 'CLOSED' WHERE id = ?";
         String selectOrderTable = "SELECT tables_id FROM orders WHERE id = " + orderID;
-        String unreserveTable = "UPDATE restaurant.tables SET table_reserved = false WHERE id = ?";
+        String unreserveTable = "UPDATE restaurant.tables SET table_reserved = 0 WHERE id = ?";
 
         try {
             PreparedStatement pStatement = connection.prepareStatement(closeOrder);
