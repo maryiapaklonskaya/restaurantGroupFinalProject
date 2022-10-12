@@ -502,30 +502,14 @@ public class Main {
         Scanner scan = new Scanner(System.in);
 
         System.out.println("""
-                Welcome to the Admin Side of the Restaurant System.
-
-                What do you want to do next?
-                
-                --- MEALS ---
-                1. View All Meals
-                2. View All Meals by Category
-                3. Add Meal
-                4. Remove Meal
-                5. Set new price for the Meal
-                6. Rename Meal
-                
-                --- WAITERS ---
-                11. View All Waiters
-                12. Add New Waiter
-                13. Remove Waiter
-                
-                --- ANALYTICS --- 
-                21. View All Orders
-                22. View Top Closed Orders 
-                23. View the Most Productive Waiters
-                24. Show Mean Revenue of Closed Orders
-                
-                0. Exit System;""");
+                Welcome to the Admin Side of the Restaurant System. What do you want to do next?
+                --- MEALS ---                       --- WAITERS ---             --- ANALYTICS ---
+                1. View All Meals                   11. View All Waiters        21. View All Orders 
+                2. View All Meals by Category       12. Add New Waiter          22. View Top Closed Orders
+                3. Add Meal                         13. Remove Waiter           23. View the Most Productive Waiters
+                4. Remove Meal                                                  24. Show Mean Revenue of Closed Orders  
+                5. Set new price for the Meal                                   
+                6. Rename Meal                                                  0. Exit System;""");
 
         int choice = scan.nextInt();
 
