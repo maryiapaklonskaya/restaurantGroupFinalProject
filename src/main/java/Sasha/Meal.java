@@ -5,17 +5,15 @@ public class Meal {
     private int price;
     private MealType mealType;
 
-    Meal(String mealTitle, int price, MealType mealType){
+    private int mealTypeId;
+
+    Meal(String mealTitle, int price, int mealTypeId){
         this.mealTitle = mealTitle;
         this.price = price;
-        setMealType(mealType);
+        this.mealTypeId = mealTypeId;
     }
 
     public String getMealTitle() {return mealTitle;}
 
     public int getPrice() {return price;}
-
-    public void setMealType(MealType mealType){
-        this.mealType = mealType;
-    }
 }

@@ -1,9 +1,27 @@
 package Sasha;
 
 import java.sql.*;
+import java.util.HashSet;
+import java.util.Scanner;
 
 public class Sasha {
 
+    public static void scannerAddMeal(Connection connection) throws SQLException {
+        HashSet<Integer> mealId = getAllMealsId(connection);
+
+        Scanner helloWorld = new Scanner(System.in);
+        System.out.println("\nEnter meal name: ");
+        String mealName = helloWorld.nextLine();
+
+        int mealTypeId = scannerChooseMealType(connection);
+        if(!mealId.contains(mealTypeId)) { System.out.println("Please enter an existing id"); return;}
+
+        System.out.println("\nEnter price: ");
+        int mealPrice = helloWorld.nextInt();
+//        тут можно проверку на ввод сделать, но я пока думаю над этим
+
+        addMeal(connection, mealName, mealPrice, mealTypeId);
+    }
     public static void theMostPopularMealsDESC(Connection connection) throws SQLException{
         String mostPopularMeal = "SELECT meal_title, count(quantity_of_meals) FROM restaurant.orders_items \n" +
                 "INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id\n" +
@@ -84,17 +102,18 @@ public class Sasha {
 //        removeMeal(connection, "lazania");
 //        removeMeal(connection, "lasagna");
 
-        getTop10ClosedOrdersDesc(connection);
-        sortWaitersBySumRevenueDESC(connection);
-        getMeanClosedOrders(connection);
+//        getTop10ClosedOrdersDesc(connection);
+//        sortWaitersBySumRevenueDESC(connection);
+//        getMeanClosedOrders(connection);
         theMostPopularMealsDESC(connection);
+
+//        scannerAddMeal(connection);
     }
 
-    public static void addMeal(Connection connection, String mealTitle, int price, MealType mealType) throws SQLException{
+    public static void addMeal(Connection connection, String mealTitle, int price, int mealTypeId) throws SQLException{
         if(isMealPresent(connection, mealTitle)) {System.out.println("This meal already exist");  return;}
 
-        Meal meal = new Meal(mealTitle, price, mealType);
-        int mealTypeId = getMealTypeId(connection, mealType);
+        Meal meal = new Meal(mealTitle, price, mealTypeId);
 
         addToDatabase(connection, meal, mealTypeId);
     }
@@ -129,7 +148,7 @@ public class Sasha {
         if(!isMealPresent(connection, mealTitle)) {System.out.println("This meal isn't exist"); return;}
 
         ResultSet rs = searchOfMeal(connection, mealTitle);
-        outputOnDisplay(rs);
+        onDisplayMeal(rs);
         rs.close();
     }
 
@@ -153,6 +172,8 @@ public class Sasha {
         pStatement.setInt(3, (mealTypeId));
         pStatement.executeUpdate();
         pStatement.close();
+
+        System.out.println("Meal add to Database");
     }
 
     public static int getMealId(Connection connection, String mealTitle) throws SQLException{
@@ -175,15 +196,6 @@ public class Sasha {
         return mealPrice;
     }
 
-    public static int getMealTypeId(Connection connection, MealType mealType) throws SQLException {
-        String getMealTypeIndex = "SELECT id FROM restaurant.meal_type WHERE meal_type='"+mealType.getReadableName()+"';";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(getMealTypeIndex);
-        resultSet.next();
-
-        return resultSet.getInt(1);
-    }
-
     public static ResultSet searchOfMeal(Connection connection, String MealTitle) throws SQLException {
         String searchOfMeal = "SELECT * FROM restaurant.meals WHERE meal_title=\""+MealTitle+"\"";
         Statement statement = connection.createStatement();
@@ -202,10 +214,48 @@ public class Sasha {
         return result;
     }
 
-    public static void outputOnDisplay(ResultSet rs) throws SQLException{
+    public static void onDisplayMeal(ResultSet rs) throws SQLException{
         while (rs.next()){
-            System.out.println("Meal Title: "+rs.getString("meal_title")+
-                    "\nPrice: "+rs.getInt("price")+"\n");
+            System.out.print("Meal Title: "+rs.getString("meal_title"));
+            System.out.println("Price: "+rs.getInt("price"));
         }
+    }
+
+    public static void onDisplayMealType(ResultSet rs) throws SQLException{
+        System.out.println("\n");
+        while (rs.next()){
+            System.out.print("Meal Id: "+rs.getString(1));
+            System.out.println("   Meal type: "+rs.getString(2));
+        }
+    }
+
+    public static HashSet getAllMealsId(Connection connection) throws SQLException{
+        HashSet<Integer> mealId = new HashSet<>();
+
+        String id = "SELECT id FROM restaurant.meal_type";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(id);
+
+        while (resultSet.next()) {
+            mealId.add(resultSet.getInt(1));
+        }
+        return mealId;
+    }
+
+    public static int scannerChooseMealType(Connection connection) throws SQLException{
+        String mealType = "SELECT id, meal_type FROM restaurant.meal_type";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(mealType);
+        onDisplayMealType(resultSet);
+
+        Scanner helloWorld = new Scanner(System.in);
+
+        System.out.println("\nEnter the Id the dish belongs to: ");
+        int mealTypeId = helloWorld.nextInt();
+        helloWorld.nextLine();
+
+        return mealTypeId;
     }
 }
