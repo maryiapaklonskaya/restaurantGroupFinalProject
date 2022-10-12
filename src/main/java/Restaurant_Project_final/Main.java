@@ -125,17 +125,11 @@ public class Main {
         int orderID;
 
         System.out.println("""
-
                 What do you want to do next?
-
-                1. View Menu
-                2. Create order
-                3. Cancel order
-                4. Close order
-                5. Create a cheque
-                6. Reserve table
-                7. Take off reservation
-                0. Exit System""");
+                1. View Menu    2. Create order     5. Create a cheque          0. Exit System
+                                3. Cancel order     6. Reserve table
+                                4. Close order      7. Take off reservation
+                """);
 
 
         int choice = scan.nextInt();
