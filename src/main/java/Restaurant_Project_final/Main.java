@@ -527,13 +527,18 @@ public class Main {
                 
                 --- ANALYTICS --- 
                 21. View All Orders
-                22. View Top Popular Meals 
+                22. View Top Closed Orders 
                 23. View the Most Productive Waiters
-                24. Show Mean Revenue of Closed Orders;""");
+                24. Show Mean Revenue of Closed Orders
+                
+                0. Exit System;""");
 
         int choice = scan.nextInt();
 
         switch (choice) {
+            case 0 -> {
+                welcomeScreen(connection);
+            }
             case 1 -> {
                 getAllMeals(connection);
                 welcomeAdminScreen(connection);
@@ -549,7 +554,6 @@ public class Main {
                     throw new RuntimeException(e);
                 }
                 welcomeAdminScreen(connection);
-
             }
             case 4 -> {
                 try {
@@ -558,7 +562,6 @@ public class Main {
                     throw new RuntimeException(e);
                 }
                 welcomeAdminScreen(connection);
-
             }
             case 5 -> {
                 try {
@@ -566,9 +569,7 @@ public class Main {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
-
                 welcomeAdminScreen(connection);
-
             }
             case 6 -> {
                 try {
@@ -577,7 +578,6 @@ public class Main {
                     throw new RuntimeException(e);
                 }
                 welcomeAdminScreen(connection);
-
             }
             case 11 -> {
                 getAllWaiters(connection);
@@ -592,27 +592,34 @@ public class Main {
                 removeWaiter(connection);
                 welcomeAdminScreen(connection);
             }
-
             case 21 -> {
                 getAllOrders(connection);
                 welcomeAdminScreen(connection);
             }
             case 22 -> {
-                addWaiter(connection);
+                try {
+                    getTop10ClosedOrdersDesc(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 welcomeAdminScreen(connection);
             }
             case 23 -> {
-                removeWaiter(connection);
+                try {
+                    sortWaitersBySumRevenueDESC(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 welcomeAdminScreen(connection);
             }
             case 24 -> {
-                removeWaiter(connection);
+                try {
+                    getMeanClosedOrders(connection);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
                 welcomeAdminScreen(connection);
             }
-
-//            22. View Top Popular Meals
-//            23. View the Most Productive Waiters
-//            24. Show Mean Revenue of Closed Orders;
 
             default -> {
                 System.out.println(" ---> There is no such option, please choose another one <--- ");
@@ -842,6 +849,59 @@ public class Main {
         pStatement.close();
 
         System.out.println("Meal" + mealTitletoRename + " was renamed to " + newTitle);
+    }
+
+    public static void getTop10ClosedOrdersDesc(Connection connection) throws SQLException{
+        String Top10ClosedOrdersDesc = "SELECT order_id, restaurant.orders.tables_id, restaurant.orders.status, ROUND(SUM(price*quantity_of_meals),2) " +
+                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
+                " ON orders.id = orders_items.order_id WHERE status=\"closed\" GROUP BY order_id ORDER BY ROUND(SUM(price*quantity_of_meals),2) DESC LIMIT 10";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(Top10ClosedOrdersDesc);
+
+        while (resultSet.next()) {
+            System.out.print("Total amount: " + resultSet.getDouble(4));
+            System.out.print("   Order ID: " + resultSet.getInt(1));
+            System.out.print("  Table ID: " + resultSet.getInt(2));
+            System.out.println("  Status: " + resultSet.getString(3));
+        }
+    }
+
+    public static void sortWaitersBySumRevenueDESC(Connection connection) throws SQLException{
+        String sortWaitersByRevenueDESC = "SELECT waiters.name, waiters.surname, ROUND(SUM(price*quantity_of_meals),2)\n" +
+                " FROM restaurant.waiters INNER JOIN restaurant.tables ON waiters.id = tables.waiter_id\n" +
+                " INNER JOIN restaurant.orders ON orders.tables_id = tables.id \n" +
+                " INNER JOIN restaurant.orders_items ON orders_items.order_id = orders.id\n" +
+                " INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id\n" +
+                " GROUP BY waiters.id ORDER BY ROUND(SUM(price*quantity_of_meals),2) DESC;";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(sortWaitersByRevenueDESC);
+
+        while (resultSet.next()) {
+            System.out.print(resultSet.getString(1));
+            System.out.print(" " + resultSet.getString(2));
+            System.out.println("   Total amount: " + resultSet.getDouble(3));
+        }
+    }
+
+    public  static  void getMeanClosedOrders(Connection connection) throws SQLException{
+        String getClosedOrders = "SELECT ROUND(SUM(price*quantity_of_meals),2) " +
+                " FROM restaurant.orders_items INNER JOIN restaurant.meals ON orders_items.meal_id = meals.id INNER JOIN restaurant.orders " +
+                " ON orders.id = orders_items.order_id WHERE status=\"closed\" GROUP BY order_id";
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(getClosedOrders);
+
+        double countRow = 0;
+        double amount = 0;
+
+        while (resultSet.next()) {
+            amount += resultSet.getDouble(1);
+            countRow ++;
+        }
+
+        System.out.println("Average closed check "+amount/countRow);
     }
 
 
