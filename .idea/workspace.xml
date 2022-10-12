@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="09ab8526-b3b3-4546-888f-8a253002f437" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Maryia.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Maryia.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Restaurant_Project_final/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Restaurant_Project_final/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -178,7 +180,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665583884360</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="FINAL.3 (?)">
+      <created>1665586458931</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1665586458932</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -200,7 +209,8 @@
     <MESSAGE value="added many methods and finished the Orders/Waiters choices" />
     <MESSAGE value="pre-final commit" />
     <MESSAGE value="FINAL (?)" />
-    <option name="LAST_COMMIT_MESSAGE" value="FINAL (?)" />
+    <MESSAGE value="FINAL.3 (?)" />
+    <option name="LAST_COMMIT_MESSAGE" value="FINAL.3 (?)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

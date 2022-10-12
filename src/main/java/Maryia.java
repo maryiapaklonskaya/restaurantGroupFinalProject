@@ -53,7 +53,7 @@ public class Maryia {
             if (!(resultSet == null)) {
                 while (resultSet.next()) {
                     userName = resultSet.getString(1);
-                    System.out.println("\n" + userName + ", welcome to the Waiter Side of the Restaurant System.");
+                    //System.out.println("\n" + userName + ", welcome to the Waiter Side of the Restaurant System.");
                     welcomeWaitersScreen(connection, userName);
                 }
             } else {
@@ -72,6 +72,7 @@ public class Maryia {
             System.out.println(" ---> There is no such user, please try again <--- ");
             welcomeScreen(connection);
         } else {
+            System.out.println("\n" + userName + ", welcome to the Waiter Side of the Restaurant System.");
             waitersChoice(connection, authID);
             }
         }

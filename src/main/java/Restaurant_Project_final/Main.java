@@ -79,7 +79,6 @@ public class Main {
             if (!(resultSet == null)) {
                 while (resultSet.next()) {
                     userName = resultSet.getString(1);
-                    System.out.println("\n" + userName + ", welcome to the Waiter Side of the Restaurant System.");
                     welcomeWaitersScreen(connection, userName);
                 }
             } else {
@@ -98,6 +97,7 @@ public class Main {
             System.out.println(" ---> There is no such user, please try again <--- ");
             welcomeScreen(connection);
         } else {
+            System.out.println(userName + ", welcome to the Waiter Side of the Restaurant System.");
             waitersChoice(connection, authID);
         }
     }
@@ -881,9 +881,6 @@ public class Main {
 
         System.out.println("Average closed check "+amount/countRow);
     }
-
-
-
 
 
 }
